@@ -2,12 +2,11 @@
 #include <WiFi.h>
 #include <esp32cam.h>
  
-const char* WIFI_SSID = "Enzo’s iPhone 13";
-const char* WIFI_PASS = "ourbread";
+const char* WIFI_SSID = "enzop";
+const char* WIFI_PASS = "makeuoft2025";
  
 WebServer server(80);
- 
- 
+
 static auto loRes = esp32cam::Resolution::find(320, 240);
 static auto midRes = esp32cam::Resolution::find(350, 530);
 static auto hiRes = esp32cam::Resolution::find(800, 600);
