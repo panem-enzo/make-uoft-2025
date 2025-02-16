@@ -2,17 +2,14 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 
-// Replace with your WiFi credentials
+// Wifi Hotspot
 const char* ssid = "enzop";
 const char* password = "makeuoft2025";
 
-// Cloudflare Worker URL
 const char* cloudflareWorkerURL = "https://615c250b-cloudflare-worker.panemjf.workers.dev/";
 
-// Start MJPEG stream
 WiFiServer server(80);
 
-// Initialize Camera Settings
 void setupCamera() {
     camera_config_t config;
     Serial.printf("PSRAM Size: %d bytes\n", ESP.getPsramSize());
@@ -78,7 +75,6 @@ void loop() {
     if (client) {
         Serial.println("Client Connected");
 
-        // Send HTTP Header for MJPEG Stream
         client.println("HTTP/1.1 200 OK");
         client.println("Content-Type: multipart/x-mixed-replace; boundary=frame");
         client.println();
@@ -87,7 +83,6 @@ void loop() {
             camera_fb_t *fb = esp_camera_fb_get();
             if (!fb) continue;
 
-            // Send MJPEG Frame
             client.println("--frame");
             client.println("Content-Type: image/jpeg");
             client.print("Content-Length: ");
