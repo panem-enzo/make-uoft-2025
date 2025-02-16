@@ -24,11 +24,22 @@ def setup():
     fig, ax = plt.subplots(figsize=(6, 6), subplot_kw={'projection': 'polar'})
     ax.set_ylim(0, 400)  # Radar range in cm
     ax.set_yticks([100, 200, 300, 400])   # Range markers
-    ax.set_xticks(np.radians([150, 120, 90, 60, 30, 0, -30, -60, -90, -120, -150, -180]))  # Angle markers
-    ax.set_xticklabels(["150", "120", "90", "60", "30", "0°", "30°", "60°", "90°", "60°", "30°", "0°"])
+    ax.set_xticks(np.radians([0, -30, -60, -90, -120, -150, -180]))  # Angle markers
+    ax.set_xticklabels(["90°", "60°", "30°", "0°", "30°", "60°", "90°"])
     sc = ax.scatter([], [], c='r', label="Object", s=50)
     # Sweeping line (initially empty)
     sweep_line, = ax.plot(-90, 400, 'g-', linewidth=2, label="Sweeping Line")
+    # 🔵 Radar Plot Setup
+   
+
+    # 🔴 Scatter plot for detected objects
+    sc = ax.scatter([], [], c='r', label="Object", s=50)
+
+    # ✅ Static Sweeping Line at -90° (270°) (Straight Down)
+    r_values = np.linspace(0, 400, 50)  # Full line from center to max range
+    theta_values = np.full_like(r_values, np.radians(-90))  # Fixed at -90° (straight down)
+    sweep_line, = ax.plot(theta_values, r_values, 'g-', linewidth=2, label="Sweeping Line")
+
     st.pyplot(fig)
     return fig, ax, sc, sweep_line
 
@@ -54,7 +65,8 @@ while True:
             
             # Store Data for Plotting
             if distance < 800:  # Ignore out-of-range values
-                data_points.append((np.radians(angle), distance))
+                data_points.append((np.radians(180-angle), distance))
+
 
             if len(data_points) > 3:
                 data_points.pop(0)  # Remove the oldest point
@@ -62,32 +74,29 @@ while True:
             # flip data points
             if data_points:
                 angles, distances = zip(*data_points)
-                angles = -1* (180-np.array(angles))  # Flip angles
+                angles = np.array(angles) * -1  # Flip angles
                 distances = np.array(distances)
             else:
                 angles, distances = np.array([]), np.array([])
             
-
             # 🔄 Update Sweeping Line
-            # r_values = np.linspace(0, 400, 50)  # Full radial line
-            # theta_values = np.full_like(r_values, np.radians(angle))  # Keep angle fixed
-            # # Change line color based on distance
-            # color = 'red' if distance < 500 else 'green'
-            # sweep_line.set_data(theta_values, r_values)
-            # sweep_line.set_color(color)
-
+            r_values = np.linspace(0, 400, 50)  # Full radial line
+            theta_values = np.full_like(r_values, np.radians(180-angle) * -1)  # Keep angle fixed
+            # Change line color based on distance
+            color = 'red' if distance < 500 else 'green'
+            sweep_line.set_data(theta_values, r_values)
+            sweep_line.set_color(color)
 
             # Update UI
             # with placeholder.container():
             #     st.write(f"**Angle:** {angle}° | **Distance:** {distance} cm")
             # 🔄 Update Radar Plot
-            
             sc.set_offsets(np.c_[angles, distances])
             ax.set_title("Real-Time Radar Feed")
             ax.legend()
             placeholder.pyplot(fig)
-
             time.sleep(0.1)  # Refresh every 100ms
+
         # except:
         #     st.error("❌ Error reading from Serial. Check Connection!")
         #     break
